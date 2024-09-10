@@ -1,10 +1,7 @@
 #include "Sudoku_to_cnf.h"
 using namespace std;
-int table[10][10];
-extern bool *value_list;
-extern int varNum;
 
-void Generate_table(char *input) {
+Sudoku_Solver::Sudoku_Solver(char *input) {
     int col = 1, row = 1;
     for(int i = 0; i < strlen(input); i++) {
         char c = input[i];
@@ -19,7 +16,7 @@ void Generate_table(char *input) {
     }
 }
 
-void PrintSoduku() {
+void Sudoku_Solver::PrintSoduku() {
     for(int i = 1; i <= 9; i++) {
         cout << "| ";
         for(int j = 1; j <= 9; j++) {
@@ -30,7 +27,7 @@ void PrintSoduku() {
 }
 
 
-void Sudoku_to_cnf() {
+void Sudoku_Solver::Sudoku_to_cnf() {
     ofstream out("../src/cnffile/sudoku.cnf");
 
     int numClause = 0;
@@ -131,20 +128,21 @@ void Sudoku_to_cnf() {
     out.close();
 }
 
-void getAnswer() {
+void Sudoku_Solver::getAnswer() {
     Sudoku_to_cnf();
-    CNFParser("sudoku.cnf");
-    bool s = DPLL();
+    auto solver = CNFParser("sudoku.cnf");
+    bool s = solver->DPLL();
     for(int i = 1; i <= 9; i++) {
         for(int j = 1; j <= 9; j++) {
             for(int k = 1; k <= 9; k++) {
-                if(value_list[(i-1)*81 + (j-1)*9 + k]) {
+                if(solver->value_list[(i-1)*81 + (j-1)*9 + k]) {
                     table[i][j] = k;
                 }
             }
         }
     }
-    DestroyList();
-    saveRes("sudoku", s, 0);
+    solver->DestroyList();
+    solver->saveRes("sudoku", s, 0);
     PrintSoduku();
+    delete solver;
 }

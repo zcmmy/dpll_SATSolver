@@ -1,11 +1,22 @@
 #include "dpll.h"
 using namespace std;
 
-extern Head *root;
-extern int varNum, clauseNum, nums, nums2;
-extern bool *value_list;
+SAT_Solver::SAT_Solver(int varNum, int clauseNum):varNum(varNum), clauseNum(clauseNum) {
+    root = new Head;
+    root->next = nullptr;
+    root->first = nullptr;
 
-void PrintList() {
+    value_list = new bool[varNum + 1];
+    memset(value_list, 0, sizeof(bool) * (varNum + 1));
+}
+
+SAT_Solver::~SAT_Solver() {
+    DestroyList();
+    delete [] value_list;
+}
+
+
+void SAT_Solver::PrintList() const {
     for(auto p = root->next; p; p = p->next) {
         for(auto q = p->first; q; q = q->next) {
             if(q->is_neg) printf("-");
@@ -15,7 +26,7 @@ void PrintList() {
     }
 }
 
-void DestroyList() {
+void SAT_Solver::DestroyList() const {
     // 销毁链表
     auto p = root;
     while(p) {
@@ -31,14 +42,14 @@ void DestroyList() {
     }
 }
 
-void CreateClause() {
+void SAT_Solver::CreateClause() {
     auto *new_Clause = new Head;
     new_Clause->next = root->next;
     new_Clause->first = nullptr;
     root->next = new_Clause;
 }
 
-Head* DestroyClause(Head *tar, ClauseStack &cs) {
+Head* SAT_Solver::DestroyClause(Head *tar, ClauseStack &cs) {
     // 销毁子句，返回下一子句
     auto p = root;
     while (p->next != tar && p->next != nullptr) {
@@ -49,7 +60,7 @@ Head* DestroyClause(Head *tar, ClauseStack &cs) {
     return p->next;
 }
 
-status Destroyliteral(const int ord, ClauseStack &cs, LiteralStack &ls) {
+status SAT_Solver::Destroyliteral(const int ord, ClauseStack &cs, LiteralStack &ls) {
     Head *p = root->next;
     while(p) {
         bool flag = true;
@@ -83,7 +94,7 @@ status Destroyliteral(const int ord, ClauseStack &cs, LiteralStack &ls) {
     return NOTHING;
 }
 
-void AddLiteral(Head *clause, const int ord, const bool is_neg) {
+void SAT_Solver::AddLiteral(Head *clause, const int ord, const bool is_neg) {
     auto *new_literal = new Node;
     new_literal->ord = ord;
     new_literal->is_neg = is_neg;
@@ -92,7 +103,7 @@ void AddLiteral(Head *clause, const int ord, const bool is_neg) {
     clause->first = new_literal;
 }
 
-status UnitPropagation(ClauseStack &cs, LiteralStack &ls) {
+status SAT_Solver::UnitPropagation(ClauseStack &cs, LiteralStack &ls) {
     // 单子句传播，返回是否找到单子句
     auto p = root->next;
     while(p) {
@@ -117,7 +128,7 @@ status UnitPropagation(ClauseStack &cs, LiteralStack &ls) {
     return NOTHING;
 }
 
-status PureLiteralelimination(ClauseStack &cs) {
+status SAT_Solver::PureLiteralelimination(ClauseStack &cs) {
     // 孤立文字消除，返回是否找到孤立文字
     int count[varNum+1] = {0};
     for(auto *p = root->next; p; p = p->next) {
@@ -146,12 +157,12 @@ status PureLiteralelimination(ClauseStack &cs) {
     return s;
 }
 
-int ChooseVariable() {
+int SAT_Solver::ChooseVariable() const {
     // 选择变元，启发函数
     return root->next->first->ord;
 }
 
-void Backup(ClauseStack &cs, LiteralStack &ls) {
+void SAT_Solver::Backup(ClauseStack &cs, LiteralStack &ls) {
     // 先对子句栈退栈
     while(!cs.is_empty()) {
         auto p = cs.pop();
@@ -167,7 +178,7 @@ void Backup(ClauseStack &cs, LiteralStack &ls) {
     }
 }
 
-bool DPLL(int v, bool is_pos) {
+bool SAT_Solver::DPLL(int v, bool is_pos) {
     // if(nums%100000) cout << flush;
     // printf("Current status: %d\n", ++nums);
     // cout << "set variable " << v << " to " << is_pos << endl;
@@ -234,14 +245,14 @@ bool DPLL(int v, bool is_pos) {
     return false;
 }
 
-void printRes() {
+void SAT_Solver::printRes() const {
     for(int i = 1; i <= varNum; i++) {
         if(value_list[i]) cout << 'x' << i << '=' << 1 << endl;
         else cout << 'x' << i << '=' << 0 << endl;
     }
 }
 
-void saveRes(const string &filename, bool res, double time) {
+void SAT_Solver::saveRes(const string &filename, bool res, double time) const {
     string path = "../src/resfile/" + filename;
     if(filename.find(".res") == string::npos) path += ".res";
     ofstream file(path, ios::out);

@@ -5,12 +5,18 @@
 #include "dpll.h"
 #include "cnfparser.h"
 
-void Generate_table(char *input);
+class Sudoku_Solver {
+private:
+    int table[10][10];
 
-void PrintSoduku();
+public:
+    Sudoku_Solver(char *input);
 
-void Sudoku_to_cnf();
+    void PrintSoduku();
 
-void getAnswer();
+    void Sudoku_to_cnf();
+
+    void getAnswer();
+};
 
 #endif //SUDOKU_TO_CNF_H

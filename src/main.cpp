@@ -25,36 +25,36 @@ int main() {
         string filename;
         cout << "Please input the filename of the CNF file: ";
         cin >> filename;
-        CNFParser(filename);
+        auto solver = CNFParser(filename);
         clock_t start_time = clock();
-        status s = DPLL();
+        status s = solver->DPLL();
         clock_t end_time = clock();
         double duration = (double)(end_time - start_time) / CLOCKS_PER_SEC;
         if(s) {
             // ¥Ú”°Ω‚
             cout << "Satified!" << endl;
             // printRes();
-            saveRes(filename, true, 1000*duration);
+            solver->saveRes(filename, true, 1000*duration);
         }
         else {
             cout << "Unsatisfied!" << endl;
-            saveRes(filename, false, duration);
+            solver->saveRes(filename, false, duration);
         }
-        DestroyList();
+        delete solver;
     }
     else if(opt == 2) {
         char input[100];
         cout << "Please input the soduku string: ";
         cin.get();
         cin.getline(input, 100);
-        Generate_table(input);
+        auto solver = Sudoku_Solver(input);
         cout << "Your Soduku is: " << endl;
-        PrintSoduku();
+        solver.PrintSoduku();
         system("pause");
         system("cls");
         PrintSubMenu();
         cin >> opt;
-        if(opt == 1) getAnswer();
+        if(opt == 1) solver.getAnswer();
     }
     system("pause");
     return 0;
