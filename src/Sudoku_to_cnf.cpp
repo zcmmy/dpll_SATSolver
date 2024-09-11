@@ -1,10 +1,10 @@
 #include "Sudoku_to_cnf.h"
 using namespace std;
 
-Sudoku_Solver::Sudoku_Solver(char *input) {
+Sudoku_Solver::Sudoku_Solver(string &input) {
     int col = 1, row = 1;
-    for(int i = 0; i < strlen(input); i++) {
-        char c = input[i];
+    memset(table, 0, sizeof(table));
+    for(char c : input) {
         if(c >= '0' && c <= '9') {
             table[col][row] = c - '0';
             row++;
@@ -16,7 +16,7 @@ Sudoku_Solver::Sudoku_Solver(char *input) {
     }
 }
 
-void Sudoku_Solver::PrintSoduku() {
+void Sudoku_Solver::PrintSoduku() const{
     for(int i = 1; i <= 9; i++) {
         cout << "| ";
         for(int j = 1; j <= 9; j++) {
@@ -141,8 +141,44 @@ void Sudoku_Solver::getAnswer() {
             }
         }
     }
-    solver->DestroyList();
     solver->saveRes("sudoku", s, 0);
-    PrintSoduku();
-    delete solver;
+}
+
+Sudoku_Solver Random_Generate(int level) {
+    random_device rd;
+
+    // 使用随机设备创建一个引擎
+    mt19937 gen(rd());
+
+    // 创建一个均匀分布范围为1到100的整数分布
+    uniform_int_distribution<> dis(0, 3);
+    int index = dis(gen);
+    string input;
+    switch(index) {
+        case 0:
+            input = "921564387758329461346187259195738642837642915462951738273415896619873524584296173";
+            break;
+        case 1:
+            input = "731856924462931578958472631129368745384517296675249183813725469296184357547693812";
+            break;
+        case 2:
+            input = "546129378237485691189673452925831746413267985768594213892756134671348529354912867";
+            break;
+        case 3:
+            input = "742865319518973246396412587831296754274581693965734821653148972427659138189327465";
+            break;
+        default:
+            input = "123456789456789123789123456234567891567891234891234567345678912678912345912345678";
+    }
+    int cnt = 0, tar[5] = {0, 30, 40, 50, 60};
+    uniform_int_distribution<> dis2(1, 9);
+    while(cnt < tar[level]) {
+        int x = dis2(gen);
+        int y = dis2(gen);
+        if(input[(x-1)*9+y-1] != '0') {
+            input[(x-1)*9+y-1] = '0';
+            cnt++;
+        }
+    }
+    return {input};
 }

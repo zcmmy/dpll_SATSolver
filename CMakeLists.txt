@@ -17,6 +17,7 @@ add_executable(dpll src/main.cpp
         src/cnfparser.cpp
         src/Sudoku_to_cnf.cpp
         src/Sudoku_to_cnf.h
+        src/cvui.h
 )
 
 target_link_libraries(dpll ${OpenCV_LIBS})

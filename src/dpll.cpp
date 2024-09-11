@@ -28,7 +28,7 @@ void SAT_Solver::PrintList() const {
 
 void SAT_Solver::DestroyList() const {
     // Ïú»ÙÁ´±í
-    auto p = root;
+    auto p = root->next;
     while(p) {
         auto q = p->first;
         while(q) {
@@ -40,6 +40,7 @@ void SAT_Solver::DestroyList() const {
         p = p->next;
         delete temp;
     }
+    delete root;
 }
 
 void SAT_Solver::CreateClause() {
